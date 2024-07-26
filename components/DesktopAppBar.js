@@ -1,7 +1,6 @@
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Dialog,
   DialogActions,
@@ -9,10 +8,11 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import useLogout from "../hooks/useLogout"; // Import useAuth
+import useLogout from "../hooks/useLogout"; // Import useLogout
 
 const DesktopAppBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 추가
+
   const {
     logoutDialogOpen,
     handleLogoutDialogOpen,
@@ -22,21 +22,18 @@ const DesktopAppBar = () => {
 
   useEffect(() => {
     const handleLoginStatusChange = () => {
-      const loginInfo = localStorage.getItem("loginInfo");
-      if (loginInfo) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
+      // 로그인 상태를 localStorage에서 확인
+      const token = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!token); // 토큰이 존재하면 로그인 상태로 간주
     };
 
     // 컴포넌트 마운트 시 초기 로그인 상태 확인
     handleLoginStatusChange();
 
-    window.addEventListener("loginStatusChanged", handleLoginStatusChange);
+    window.addEventListener("storage", handleLoginStatusChange);
 
     return () => {
-      window.removeEventListener("loginStatusChanged", handleLoginStatusChange);
+      window.removeEventListener("storage", handleLoginStatusChange);
     };
   }, []);
 
@@ -52,33 +49,21 @@ const DesktopAppBar = () => {
           </Typography>
         </Link>
         <div style={{ flexGrow: 1 }} />
-        {/* <Link href="/carts" passHref>
-          <Button color="inherit">카트</Button>
-        </Link> */}
-        <Link href="/products" passHref>
-          <Button color="inherit" style={{ color: "white" }}>
-            상품목록
-          </Button>
-        </Link>
-        <Link href="/cartItems" passHref>
-          <Button color="inherit" style={{ color: "white" }}>
-            장바구니
-          </Button>
-        </Link>
-        <Link href="/mypage" passHref>
+
+        <Link href="/admins/dashboard" passHref>
           <Button
             color="inherit"
             style={{ color: "white", display: isLoggedIn ? "block" : "none" }}
           >
-            MyPage
+            관리자보드
           </Button>
         </Link>
-        <Link href="/login" passHref>
+        <Link href="/admins/login" passHref>
           <Button
             color="inherit"
             style={{ color: "white", display: isLoggedIn ? "none" : "block" }}
           >
-            로그인
+            관리자로그인
           </Button>
         </Link>
         <Button

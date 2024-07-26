@@ -154,8 +154,12 @@ const Dashboard = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           관리자 대시보드
         </Typography>
-        <Box sx={{ marginTop: 4 }}>
-          <FormControl variant="outlined" fullWidth margin="normal">
+        <Box sx={{ marginTop: 4, display: "flex", alignItems: "center" }}>
+          <FormControl
+            variant="outlined"
+            sx={{ flex: 1, marginRight: 2 }}
+            margin="normal"
+          >
             <InputLabel>검색 기준</InputLabel>
             <Select
               value={searchCriteria}
@@ -170,7 +174,7 @@ const Dashboard = () => {
             <TextField
               label="구매자 이름"
               variant="outlined"
-              fullWidth
+              sx={{ flex: 4 }}
               margin="normal"
               value={buyerName}
               onChange={(e) => setBuyerName(e.target.value)}
@@ -180,46 +184,46 @@ const Dashboard = () => {
             <TextField
               label="전화"
               variant="outlined"
-              fullWidth
+              sx={{ flex: 4 }}
               margin="normal"
               value={buyerTel}
-              onChange={handlePhoneChange} // Use formatted phone change handler
+              onChange={handlePhoneChange}
             />
           )}
-          <Box sx={{ marginTop: 4 }}>
-            <TableContainer component={Paper} sx={{ width: "100%" }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>결제 ID</TableCell>
-                    <TableCell>구매자 이름</TableCell>
-                    <TableCell>제품 이름</TableCell>
-                    <TableCell>금액</TableCell>
-                    <TableCell>결제 방법</TableCell>
-                    <TableCell>전화</TableCell>
-                    <TableCell>주소</TableCell>
-                    <TableCell>우편번호</TableCell>
+        </Box>
+        <Box sx={{ marginTop: 4 }}>
+          <TableContainer component={Paper} sx={{ width: "100%" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>결제 ID</TableCell>
+                  <TableCell>구매자 이름</TableCell>
+                  <TableCell>제품 이름</TableCell>
+                  <TableCell>금액</TableCell>
+                  <TableCell>결제 방법</TableCell>
+                  <TableCell>전화</TableCell>
+                  <TableCell>주소</TableCell>
+                  <TableCell>우편번호</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredPayments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell>{payment.id}</TableCell>
+                    <TableCell>{payment.buyerName}</TableCell>
+                    <TableCell>{payment.name}</TableCell>
+                    <TableCell>
+                      {formatCurrency(payment.paid_amount) + "원"}
+                    </TableCell>
+                    <TableCell>{payment.payMethod}</TableCell>
+                    <TableCell>{payment.buyerTel}</TableCell>
+                    <TableCell>{payment.buyerAddr}</TableCell>
+                    <TableCell>{payment.buyerPostcode}</TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredPayments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell>{payment.id}</TableCell>
-                      <TableCell>{payment.buyerName}</TableCell>
-                      <TableCell>{payment.name}</TableCell>
-                      <TableCell>
-                        {formatCurrency(payment.paid_amount)}
-                      </TableCell>
-                      <TableCell>{payment.payMethod}</TableCell>
-                      <TableCell>{payment.buyerTel}</TableCell>
-                      <TableCell>{payment.buyerAddr}</TableCell>
-                      <TableCell>{payment.buyerPostcode}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Box>
     </Container>

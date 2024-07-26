@@ -17,7 +17,7 @@ myAxios.interceptors.response.use(
       if (typeof window !== "undefined") {
         // Local Storage를 삭제하고, `/`로 이동합니다.
         localStorage.clear();
-        window.location.href = "/";
+        window.location.href = "/admins/login";
       }
     }
 
