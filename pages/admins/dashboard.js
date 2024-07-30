@@ -120,7 +120,9 @@ const Dashboard = () => {
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("ko-KR", {
-      style: "currency",
+      style: "decimal", // Changed from "currency" to "decimal"
+
+      // style: "currency",
       currency: "KRW",
     }).format(amount);
   };

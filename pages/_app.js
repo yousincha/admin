@@ -46,7 +46,7 @@ function MyApp({ Component, pageProps }) {
 
         try {
           const response = await myAxios.post(
-            "/members/refreshToken",
+            "/admin/refreshToken",
             { refreshToken },
             {
               headers: {
@@ -62,7 +62,7 @@ function MyApp({ Component, pageProps }) {
 
           localStorage.removeItem("loginInfo");
           window.dispatchEvent(new CustomEvent("loginStatusChanged"));
-          router.push("/"); // router.push 사용
+          router.push("/admins/login"); // router.push 사용
         }
       }
     }, 10 * 1000);
