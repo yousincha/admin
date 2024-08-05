@@ -34,12 +34,16 @@ const Dashboard = () => {
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
+    const savedView = localStorage.getItem("view");
 
     if (accessToken && refreshToken) {
       setLoginInfo({
         accessToken,
         refreshToken,
       });
+      if (savedView) {
+        setView(savedView);
+      }
     } else {
       router.push("/admins/login");
     }
@@ -92,7 +96,7 @@ const Dashboard = () => {
     }
   };
 
-  // 사용자 목록 가져오기
+  // 사용자 목록 가져오기 및 주소 정보 추가
   const fetchUsers = async () => {
     try {
       const response = await axios.get("http://localhost:8080/members", {
@@ -100,7 +104,24 @@ const Dashboard = () => {
           Authorization: `Bearer ${loginInfo.accessToken}`,
         },
       });
-      setUsers(response.data);
+      const usersData = response.data;
+
+      // 각 사용자의 주소 정보 가져오기
+      const usersWithAddresses = await Promise.all(
+        usersData.map(async (user) => {
+          const addressResponse = await axios.get(
+            `http://localhost:8080/addresses/${user.memberId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${loginInfo.accessToken}`,
+              },
+            }
+          );
+          return { ...user, addresses: addressResponse.data };
+        })
+      );
+
+      setUsers(usersWithAddresses);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         const newAccessToken = await refreshAccessToken();
@@ -163,6 +184,12 @@ const Dashboard = () => {
     }).format(amount);
   };
 
+  const handleViewChange = (newView) => {
+    const updatedView = view === newView ? "none" : newView;
+    setView(updatedView);
+    localStorage.setItem("view", updatedView);
+  };
+
   if (loading) {
     return (
       <Box
@@ -191,14 +218,34 @@ const Dashboard = () => {
       <Box sx={{ marginTop: 4 }}>
         <Button
           variant="contained"
-          onClick={() => setView(view === "orders" ? "none" : "orders")}
+          onClick={() => handleViewChange("orders")}
+          sx={{
+            backgroundColor: "#f0f0f0",
+            borderRadius: "20px",
+            fontWeight: "bold",
+            width: "120px",
+            color: "#333",
+            "&:hover": {
+              backgroundColor: "#d0d0d0",
+            },
+          }}
         >
           주문 조회
         </Button>
         <Button
           variant="contained"
-          onClick={() => setView(view === "users" ? "none" : "users")}
+          onClick={() => handleViewChange("users")}
           style={{ marginLeft: "10px" }}
+          sx={{
+            backgroundColor: "#f0f0f0",
+            borderRadius: "20px",
+            fontWeight: "bold",
+            width: "120px",
+            color: "#333",
+            "&:hover": {
+              backgroundColor: "#d0d0d0",
+            },
+          }}
         >
           사용자 조회
         </Button>

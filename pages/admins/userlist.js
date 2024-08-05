@@ -21,6 +21,7 @@ const UserList = ({ users }) => {
               <TableCell>이름</TableCell>
               <TableCell>성별</TableCell>
               <TableCell>생년월일</TableCell>
+              <TableCell>주소록</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -37,6 +38,29 @@ const UserList = ({ users }) => {
                 </TableCell>
                 <TableCell>
                   {user.birthYear}.{user.birthMonth}.{user.birthDay}
+                </TableCell>
+                <TableCell>
+                  {user.addresses && user.addresses.length > 0
+                    ? user.addresses.map((address, index) => (
+                        <div
+                          key={address.id}
+                          style={{
+                            marginBottom: "10px",
+                            padding: "5px",
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          <strong>{index + 1}. 주소록</strong> <br />
+                          <strong>수신자:</strong> {address.recipientName}{" "}
+                          <br />
+                          <strong>전화번호:</strong> {address.recipientPhone}{" "}
+                          <br />
+                          <strong>주소:</strong> {address.address} <br />
+                          <strong>우편번호:</strong> {address.postalCode}
+                        </div>
+                      ))
+                    : "N/A"}
                 </TableCell>
               </TableRow>
             ))}
