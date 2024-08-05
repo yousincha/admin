@@ -17,8 +17,8 @@ const UserList = ({ users }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>사용자 이메일</TableCell>
               <TableCell>이름</TableCell>
+              <TableCell>사용자 이메일</TableCell>
               <TableCell>성별</TableCell>
               <TableCell>생년월일</TableCell>
               <TableCell>주소록</TableCell>
@@ -27,8 +27,8 @@ const UserList = ({ users }) => {
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.memberId}>
-                <TableCell>{user.email}</TableCell>
                 <TableCell>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>
                   {user.gender === "M"
                     ? "남자"
