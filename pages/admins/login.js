@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Box, Typography, TextField, Button } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
@@ -36,10 +36,20 @@ const LinkButton = styled(Button)`
 
 const AdminLogin = () => {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isFirstMount, setIsFirstMount] = useState(true);
+
+  useEffect(() => {
+    // 로그인 상태를 확인하고, 로그인된 경우 대시보드로 리디렉션
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && isFirstMount) {
+      alert("로그인 상태를 확인했습니다. 대시보드로 이동합니다.");
+      router.push("/admins/dashboard");
+    }
+    setIsFirstMount(false);
+  }, [router, isFirstMount]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -56,6 +66,7 @@ const AdminLogin = () => {
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("role", "admin"); // 역할을 "admin"으로 설정
 
+        alert("로그인이 성공하였습니다. 대시보드로 이동합니다.");
         router.push("/admins/dashboard").then(() => {
           window.location.reload();
         });

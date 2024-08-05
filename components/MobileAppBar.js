@@ -60,12 +60,9 @@ const MobileAppBar = ({ showBackButton }) => {
   };
 
   const menuItems = [
-    // { text: "카트", link: "/carts" },
-    { text: "상품목록", link: "/products" },
-    { text: "장바구니", link: "/cartItems" },
     isLoggedIn
-      ? { text: "MyPage", link: "/mypage" }
-      : { text: "로그인", link: "/login" },
+      ? { text: "관리자보드", link: "/admins/dashboard" }
+      : { text: "관리자로그인", link: "/admins/login" },
     isLoggedIn && { text: "로그아웃", onClick: handleLogout },
   ].filter(Boolean);
 
