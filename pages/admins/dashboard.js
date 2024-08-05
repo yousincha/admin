@@ -4,48 +4,83 @@ import {
   Container,
   Typography,
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Button,
   CircularProgress,
   Alert,
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
 import axios from "axios";
+import OrderList from "./orderlist";
+import UserList from "./userlist";
 
 const Dashboard = () => {
   const router = useRouter();
   const [paymentsInfos, setPaymentsInfos] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [buyerName, setBuyerName] = useState("");
   const [buyerTel, setBuyerTel] = useState("");
-  const [searchCriteria, setSearchCriteria] = useState("name"); // Default search criteria
+  const [searchCriteria, setSearchCriteria] = useState("name");
   const [filteredPayments, setFilteredPayments] = useState([]);
+  const [view, setView] = useState("none"); // "orders", "users", 또는 "none"
 
-  const fetchPaymentsInfos = async (accessToken) => {
+  // 상태 정의
+  const [loginInfo, setLoginInfo] = useState({
+    accessToken: null,
+    refreshToken: null,
+  });
+
+  // 클라이언트 사이드에서만 localStorage 접근
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (accessToken && refreshToken) {
+      setLoginInfo({
+        accessToken,
+        refreshToken,
+      });
+    } else {
+      router.push("/admins/login");
+    }
+  }, [router]);
+
+  // 토큰 갱신 함수
+  const refreshAccessToken = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/admins/refreshToken",
+        {
+          refreshToken: loginInfo.refreshToken,
+        }
+      );
+      if (response.status === 200) {
+        const { accessToken } = response.data;
+        localStorage.setItem("accessToken", accessToken);
+        setLoginInfo((prev) => ({ ...prev, accessToken }));
+        return accessToken;
+      }
+    } catch (error) {
+      console.error("Failed to refresh access token", error);
+      return null;
+    }
+  };
+
+  // 결제 정보 가져오기
+  const fetchPaymentsInfos = async () => {
     try {
       const response = await axios.get("http://localhost:8080/paymentInfos", {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${loginInfo.accessToken}`,
         },
       });
       setPaymentsInfos(response.data);
-      setFilteredPayments(response.data); // Initialize filtered payments
+      setFilteredPayments(response.data);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         const newAccessToken = await refreshAccessToken();
         if (newAccessToken) {
-          await fetchPaymentsInfos(newAccessToken);
+          await fetchPaymentsInfos();
         } else {
           router.push("/admins/login");
         }
@@ -57,38 +92,41 @@ const Dashboard = () => {
     }
   };
 
-  const refreshAccessToken = async () => {
+  // 사용자 목록 가져오기
+  const fetchUsers = async () => {
     try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      const response = await axios.post(
-        "http://localhost:8080/admins/refreshToken",
-        {
-          refreshToken,
+      const response = await axios.get("http://localhost:8080/members", {
+        headers: {
+          Authorization: `Bearer ${loginInfo.accessToken}`,
+        },
+      });
+      setUsers(response.data);
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        const newAccessToken = await refreshAccessToken();
+        if (newAccessToken) {
+          await fetchUsers();
+        } else {
+          router.push("/admins/login");
         }
-      );
-      if (response.status === 200) {
-        const { accessToken } = response.data;
-        localStorage.setItem("accessToken", accessToken);
-        return accessToken;
+      } else {
+        setError(err.message);
       }
-    } catch (error) {
-      console.error("Failed to refresh access token", error);
-      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
+  // 초기 데이터 로드
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (!accessToken) {
-      router.push("/admins/login");
-    } else {
-      fetchPaymentsInfos(accessToken);
+    if (loginInfo.accessToken) {
+      fetchPaymentsInfos();
+      fetchUsers();
     }
-  }, [router]);
+  }, [loginInfo]);
 
+  // 필터링 로직
   useEffect(() => {
-    // Filtering logic based on search criteria
     const filtered = paymentsInfos.filter((payment) => {
       if (searchCriteria === "name") {
         return buyerName ? payment.buyerName.includes(buyerName) : true;
@@ -101,10 +139,10 @@ const Dashboard = () => {
   }, [buyerName, buyerTel, paymentsInfos, searchCriteria]);
 
   const formatPhoneNumber = (value) => {
-    const cleaned = ("" + value).replace(/\D/g, ""); // Remove non-digits
-    const match = cleaned.match(/^(\d{0,3})(\d{0,4})(\d{0,4})$/); // Split number
+    const cleaned = ("" + value).replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{0,3})(\d{0,4})(\d{0,4})$/);
     if (match) {
-      return [match[1], match[2], match[3]].filter(Boolean).join("-"); // Join with dashes
+      return [match[1], match[2], match[3]].filter(Boolean).join("-");
     }
     return value;
   };
@@ -120,9 +158,7 @@ const Dashboard = () => {
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("ko-KR", {
-      style: "decimal", // Changed from "currency" to "decimal"
-
-      // style: "currency",
+      style: "decimal",
       currency: "KRW",
     }).format(amount);
   };
@@ -153,80 +189,32 @@ const Dashboard = () => {
   return (
     <Container>
       <Box sx={{ marginTop: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          관리자 대시보드
-        </Typography>
-        <Box sx={{ marginTop: 4, display: "flex", alignItems: "center" }}>
-          <FormControl
-            variant="outlined"
-            sx={{ flex: 1, marginRight: 2 }}
-            margin="normal"
-          >
-            <InputLabel>검색 기준</InputLabel>
-            <Select
-              value={searchCriteria}
-              onChange={handleSearchCriteriaChange}
-              label="검색 기준"
-            >
-              <MenuItem value="name">구매자 이름</MenuItem>
-              <MenuItem value="tel">전화</MenuItem>
-            </Select>
-          </FormControl>
-          {searchCriteria === "name" && (
-            <TextField
-              label="구매자 이름"
-              variant="outlined"
-              sx={{ flex: 4 }}
-              margin="normal"
-              value={buyerName}
-              onChange={(e) => setBuyerName(e.target.value)}
-            />
-          )}
-          {searchCriteria === "tel" && (
-            <TextField
-              label="전화"
-              variant="outlined"
-              sx={{ flex: 4 }}
-              margin="normal"
-              value={buyerTel}
-              onChange={handlePhoneChange}
-            />
-          )}
-        </Box>
-        <Box sx={{ marginTop: 4 }}>
-          <TableContainer component={Paper} sx={{ width: "100%" }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>결제 ID</TableCell>
-                  <TableCell>구매자 이름</TableCell>
-                  <TableCell>제품 이름</TableCell>
-                  <TableCell>금액</TableCell>
-                  <TableCell>결제 방법</TableCell>
-                  <TableCell>전화</TableCell>
-                  <TableCell>주소</TableCell>
-                  <TableCell>우편번호</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredPayments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell>{payment.id}</TableCell>
-                    <TableCell>{payment.buyerName}</TableCell>
-                    <TableCell>{payment.name}</TableCell>
-                    <TableCell>
-                      {formatCurrency(payment.paid_amount) + "원"}
-                    </TableCell>
-                    <TableCell>{payment.payMethod}</TableCell>
-                    <TableCell>{payment.buyerTel}</TableCell>
-                    <TableCell>{payment.buyerAddr}</TableCell>
-                    <TableCell>{payment.buyerPostcode}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
+        <Button
+          variant="contained"
+          onClick={() => setView(view === "orders" ? "none" : "orders")}
+        >
+          주문 조회
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => setView(view === "users" ? "none" : "users")}
+          style={{ marginLeft: "10px" }}
+        >
+          사용자 조회
+        </Button>
+        {view === "orders" && (
+          <OrderList
+            searchCriteria={searchCriteria}
+            handleSearchCriteriaChange={handleSearchCriteriaChange}
+            buyerName={buyerName}
+            setBuyerName={setBuyerName}
+            buyerTel={buyerTel}
+            handlePhoneChange={handlePhoneChange}
+            filteredPayments={filteredPayments}
+            formatCurrency={formatCurrency}
+          />
+        )}
+        {view === "users" && <UserList users={users} />}
       </Box>
     </Container>
   );
