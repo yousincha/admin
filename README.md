@@ -14,6 +14,7 @@
 이 애플리케이션은 React와 Next.js를 기반으로 하며, Material-UI를 사용하여 직관적이고 반응형 UI를 제공합니다.
 
 ![관리자 대시보드](images/dashboard.JPG)
+![관리자 대시보드](images/dashboard2.JPG)
 
 ## 주요 기능
 
