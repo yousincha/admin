@@ -25,45 +25,53 @@ const UserList = ({ users }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.memberId}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  {user.gender === "M"
-                    ? "남자"
-                    : user.gender === "F"
-                    ? "여자"
-                    : "기타"}
-                </TableCell>
-                <TableCell>
-                  {user.birthYear}.{user.birthMonth}.{user.birthDay}
-                </TableCell>
-                <TableCell>
-                  {user.addresses && user.addresses.length > 0
-                    ? user.addresses.map((address, index) => (
-                        <div
-                          key={address.id}
-                          style={{
-                            marginBottom: "10px",
-                            padding: "5px",
-                            border: "1px solid #ddd",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          <strong>{index + 1}. 주소록</strong> <br />
-                          <strong>수신자:</strong> {address.recipientName}{" "}
-                          <br />
-                          <strong>전화번호:</strong> {address.recipientPhone}{" "}
-                          <br />
-                          <strong>주소:</strong> {address.address} <br />
-                          <strong>우편번호:</strong> {address.postalCode}
-                        </div>
-                      ))
-                    : "N/A"}
+            {Array.isArray(users) && users.length > 0 ? (
+              users.map((user) => (
+                <TableRow key={user.memberId}>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.gender === "M"
+                      ? "남자"
+                      : user.gender === "F"
+                      ? "여자"
+                      : "기타"}
+                  </TableCell>
+                  <TableCell>
+                    {user.birthYear}.{user.birthMonth}.{user.birthDay}
+                  </TableCell>
+                  <TableCell>
+                    {user.addresses && user.addresses.length > 0
+                      ? user.addresses.map((address, index) => (
+                          <div
+                            key={address.id}
+                            style={{
+                              marginBottom: "10px",
+                              padding: "5px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                            }}
+                          >
+                            <strong>{index + 1}. 주소록</strong> <br />
+                            <strong>수신자:</strong> {address.recipientName}{" "}
+                            <br />
+                            <strong>전화번호:</strong> {address.recipientPhone}{" "}
+                            <br />
+                            <strong>주소:</strong> {address.address} <br />
+                            <strong>우편번호:</strong> {address.postalCode}
+                          </div>
+                        ))
+                      : "N/A"}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  No users available
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

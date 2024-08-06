@@ -22,7 +22,7 @@ const OrderList = ({
   setBuyerName,
   buyerTel,
   handlePhoneChange,
-  filteredPayments,
+  filteredPayments = [], // Default to empty array
   formatCurrency,
 }) => {
   return (
