@@ -220,13 +220,13 @@ const Dashboard = () => {
           variant="contained"
           onClick={() => handleViewChange("orders")}
           sx={{
-            backgroundColor: "#f0f0f0",
+            backgroundColor: view === "orders" ? "#000" : "#f0f0f0",
             borderRadius: "20px",
             fontWeight: "bold",
             width: "120px",
-            color: "#333",
+            color: view === "orders" ? "#fff" : "#333",
             "&:hover": {
-              backgroundColor: "#d0d0d0",
+              backgroundColor: view === "orders" ? "#333" : "#d0d0d0",
             },
           }}
         >
@@ -237,13 +237,14 @@ const Dashboard = () => {
           onClick={() => handleViewChange("users")}
           style={{ marginLeft: "10px" }}
           sx={{
-            backgroundColor: "#f0f0f0",
+            backgroundColor: view === "users" ? "#000" : "#f0f0f0",
             borderRadius: "20px",
             fontWeight: "bold",
             width: "120px",
-            color: "#333",
+            color: view === "users" ? "#fff" : "#333",
+            marginLeft: "10px",
             "&:hover": {
-              backgroundColor: "#d0d0d0",
+              backgroundColor: view === "users" ? "#333" : "#d0d0d0",
             },
           }}
         >
