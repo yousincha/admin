@@ -1,6 +1,6 @@
 ![header](https://capsule-render.vercel.app/api?type=wave&color=FFABAB&height=300&section=header&text=YOUGOD❤️&fontSize=90&fontColor=FFFFFF&animation=fadeIn&stroke=2&strokeColor=FFFFFF)
 
-# 쇼핑몰 관리 클라이언트 API
+# 쇼핑몰 클라이언트 API
 
 이 프로젝트는 쇼핑몰 관리자를 위한 클라이언트 측 API를 제공합니다. 
 이 API는 관리자가 쇼핑몰의 다양한 측면을 효율적으로 관리할 수 있도록 돕습니다. 
